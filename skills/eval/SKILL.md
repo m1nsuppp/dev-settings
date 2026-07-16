@@ -16,8 +16,9 @@ Generator(구현자)와 분리된 Evaluator 에이전트를 스폰하여 산출�
 
 ```
 Agent(subagent_type="evaluator",
-  prompt="$CLAUDE_PROJECT_DIR/.claude/agents/evaluator.md를 읽고 현재 프로젝트를 평가하라.
-         4축(기능 정확성/코드 품질/독창성/사용성&보안) 100점 만점.
+  prompt="현재 프로젝트를 평가하라.
+         4축(기능 정확성/코드 품질/독창성/사용성&보안), 기본 100점 만점.
+         채점 불가로 스킵한 축은 분모에서 제외하고 100점 기준으로 환산하라.
          결과를 EVAL_REPORT.md에 저장.")
 ```
 
@@ -26,10 +27,12 @@ Agent(subagent_type="evaluator",
 Evaluator가 완료되면 EVAL_REPORT.md를 읽고 사용자에게 요약 보고:
 
 ```
-📊 Eval 결과: [PASS/CONDITIONAL/FAIL] — [N]/100점
+📊 Eval 결과: [PASS/CONDITIONAL/FAIL] — [N]/[만점] → 환산 [N]/100
 
 기능 정확성: [N]/40 | 코드 품질: [N]/25
 독창성: [N]/20 | 사용성&보안: [N]/15
+
+스킵된 축: [없음 / 축 이름 + 사유]
 
 [수정 필요 항목 요약]
 ```

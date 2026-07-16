@@ -102,44 +102,31 @@ model: opus
 
 ### Step 1: 증거 수집
 
-기본 검증:
+각 도구로 검증한다. 명령어는 프로젝트 구조에 맞게 직접 판단해서 구성한다.
 
-```bash
-# 빌드
-npx tsc --noEmit 2>&1 || echo "TYPECHECK_FAIL"
+| 목적                                  | 도구                             |
+| ------------------------------------- | -------------------------------- |
+| 타입 체크                             | tsc                              |
+| 린트                                  | eslint                           |
+| 테스트 + 커버리지                     | vitest                           |
+| 시크릿                                | gitleaks                         |
+| 순환참조                              | madge                            |
+| 데드코드                              | knip                             |
+| AI 슬롭 패턴 (console.log, as any 등) | ast-grep                         |
+| 복잡도 통계                           | scc                              |
+| 의존성 취약점                         | npm audit (패키지 매니저에 맞게) |
 
-# 린트
-npx eslint . --max-warnings=0 2>&1 || echo "LINT_FAIL"
+**규칙:**
 
-# 테스트 + 커버리지
-npx vitest run --coverage 2>&1 || npx jest --coverage 2>&1 || pytest --cov 2>&1
-```
-
-심층 감사:
-
-```bash
-# 시크릿 — gitleaks (800+ 패턴, grep보다 오탐 적음)
-gitleaks detect --source . --no-git -v 2>&1 | head -20
-
-# 순환참조 — madge
-npx madge --circular --extensions ts,tsx src/ 2>/dev/null
-
-# 데드코드 — knip
-npx knip --no-exit-code 2>/dev/null | head -30
-
-# AI 슬롭 패턴 — ast-grep (AST 수준, grep보다 정확)
-sg --pattern 'console.log($$$)' --lang ts src/ 2>/dev/null | head -10
-sg --pattern '$A as any' --lang ts src/ 2>/dev/null | head -10
-
-# 코드 통계 — scc
-scc --by-file -s complexity src/ 2>/dev/null | tail -20
-```
-
-도구 미설치 시 해당 단계만 스킵하고 보고서에 명시한다.
+- 도구가 설치돼 있지 않으면 그 축은 스킵하고 보고서에 `SKIP: <도구> 미설치`로 명시한다. **원격 설치(npx 자동 fetch)를 시도하지 않는다.**
+- 도구 실행 실패와 "이슈 0건"을 구분한다. 실패를 클린으로 판정하지 않는다.
+- 스킵된 축은 0점이 아니라 **분모에서 제외**하고, 환산 점수와 원래 만점을 함께 표기한다. (예: `72/85 → 환산 85점`)
 
 ### Step 2: 점수 산출
 
-각 축의 점수를 합산. 총 100점 만점.
+각 축의 점수를 합산. 기본 100점 만점.
+채점 불가로 스킵한 축이 있으면 그 축의 배점을 만점에서 뺀 뒤, 100점 기준으로 환산한다.
+판정은 환산 점수로 한다.
 
 ### Step 3: 판정
 
@@ -161,7 +148,9 @@ CONDITIONAL/FAIL 시 구현자가 수정 → 재평가. 평가자는 직접 코�
 
 ## 판정: [PASS / CONDITIONAL / FAIL]
 
-## 총점: [N]/100
+## 총점: [N]/[만점] → 환산 [N]/100
+
+스킵된 축: [없음 / 축 이름 + 사유]
 
 ### Step 1 (요구사항 의심) — 기능 정확성: [N]/40
 
