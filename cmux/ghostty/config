@@ -1,0 +1,5 @@
+font-family = JetBrains Mono
+font-family = Pretendard
+font-size = 18
+theme = Dracula
+scrollback-limit = 100000
