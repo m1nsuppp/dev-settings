@@ -1,3 +1,6 @@
 # OS
 .DS_Store
 Thumbs.db
+
+# skills CLI (재생성됨)
+.skill-lock.json
