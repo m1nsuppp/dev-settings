@@ -1,0 +1,25 @@
+// Zed keymap
+//
+// For information on binding keys, see the Zed
+// documentation: https://zed.dev/docs/key-bindings
+//
+// To see the default key bindings run `zed: open default keymap`
+// from the command palette.
+[
+  {
+    // git 패널: ctrl-shift-g → cmd-shift-g로 변경.
+    // cmd-shift-g는 기본적으로 Pane에서 search::SelectPreviousMatch에
+    // 할당되어 있으므로 Pane 수준에서도 오버라이드한다.
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-shift-g": null,
+      "cmd-shift-g": "git_panel::ToggleFocus"
+    }
+  },
+  {
+    "context": "Pane",
+    "bindings": {
+      "cmd-shift-g": "git_panel::ToggleFocus"
+    }
+  }
+]
